@@ -13,18 +13,52 @@ export type GradingResult = z.infer<typeof gradingResultSchema>;
 let client: OpenAI | null = null;
 
 function getClient() {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error(
-      "OPENAI_API_KEY is not set. Copy .env.example to .env.local and add your key.",
-    );
-  }
   if (!client) {
     client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
   return client;
 }
 
-export async function gradeExerciseAnswer(params: {
+function normalize(s: string) {
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/['".,!?]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+/**
+ * No OPENAI_API_KEY configured yet: fall back to a simple local check against
+ * the seeded reference answer instead of calling OpenAI. The reference answer
+ * is always surfaced as `corrected` so the learner sees a model answer either
+ * way. Swap to real AI grading later just by setting the env var — no code
+ * change needed, see gradeExerciseAnswer below.
+ */
+function gradeLocally(params: {
+  referenceAnswer: string;
+  userAnswer: string;
+}): GradingResult {
+  const { referenceAnswer, userAnswer } = params;
+  const variants = referenceAnswer
+    .split(/[;/]/)
+    .map(normalize)
+    .filter(Boolean);
+  const normalizedAnswer = normalize(userAnswer);
+  const isCorrect = variants.some(
+    (v) => v === normalizedAnswer || normalizedAnswer.includes(v) || v.includes(normalizedAnswer),
+  );
+
+  return {
+    score: isCorrect ? 100 : 0,
+    isCorrect,
+    feedback: isCorrect
+      ? "Khớp với đáp án mẫu. (Đang chấm bằng so khớp đơn giản — thêm OPENAI_API_KEY để AI chấm và giải thích chi tiết hơn.)"
+      : "Chưa khớp với đáp án mẫu bên dưới — tự so sánh với câu trả lời của bạn. (Đang chấm bằng so khớp đơn giản — thêm OPENAI_API_KEY để AI chấm và giải thích chi tiết hơn.)",
+    corrected: referenceAnswer,
+  };
+}
+
+async function gradeWithOpenAI(params: {
   exercisePrompt: string;
   referenceAnswer: string;
   userAnswer: string;
@@ -68,4 +102,16 @@ Grade the student's answer.`,
 
   const parsed = gradingResultSchema.parse(JSON.parse(raw));
   return parsed;
+}
+
+export async function gradeExerciseAnswer(params: {
+  exercisePrompt: string;
+  referenceAnswer: string;
+  userAnswer: string;
+  exerciseType: string;
+}): Promise<GradingResult> {
+  if (!process.env.OPENAI_API_KEY) {
+    return gradeLocally(params);
+  }
+  return gradeWithOpenAI(params);
 }

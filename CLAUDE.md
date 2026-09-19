@@ -18,7 +18,7 @@ A single-user (no login) web app to study English comprehensively:
 | Duolingo integration | Quick-launch button opening `https://www.duolingo.com/learn` in a new tab | `duolingo.com` sends `X-Frame-Options: SAMEORIGIN` (verified via `curl -I`), so iframe embedding is blocked by the browser regardless of implementation. A same-browser new-tab link keeps the existing Duolingo session (cookies are per-domain, not per-tab) without violating Duolingo's ToS. Reverse-engineered/unofficial API integration was explicitly rejected by the user as too risky. |
 | Auth | **None.** Single-user personal app. | User explicitly said no login is needed — this app is for personal use only. |
 | Progress persistence | Real hosted database (Postgres), not `localStorage`. | User explicitly required data to always be saved/persisted, which browser-only storage cannot guarantee across devices/browser resets. |
-| AI grading provider | **OpenAI API (GPT)** | User's explicit choice over Anthropic/Claude API. |
+| AI grading provider | **OpenAI API (GPT)**, with an automatic local fallback | User's explicit choice over Anthropic/Claude API. User deferred adding `OPENAI_API_KEY` — `gradeExerciseAnswer` (`src/lib/grading.ts`) checks for the key at call time: absent → simple local match against the seeded reference answer (always shown as the model answer); present → real OpenAI grading. No code change needed to switch over, just set the env var. |
 | Hosting | Vercel | Confirmed by user's existing Vercel account/project setup screenshots. |
 | Source control | GitHub repo `https://github.com/Snoww-dev/English.git` (already created, empty) | Confirmed by user's existing repo screenshot. |
 
