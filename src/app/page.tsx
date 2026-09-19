@@ -1,69 +1,115 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { DuolingoLaunchButton } from "@/components/duolingo-launch-button";
+import { getAllTopics, getProgressSummary } from "@/lib/content";
 
-export default function Home() {
+
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [topics, progress] = await Promise.all([
+    getAllTopics(),
+    getProgressSummary(),
+  ]);
+
+  const completionPct =
+    progress.totalExercises > 0
+      ? Math.round(
+          (progress.perTopic.reduce((sum, t) => sum + Math.min(t.attempted, t.totalExercises), 0) /
+            progress.totalExercises) *
+            100,
+        )
+      : 0;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="space-y-8">
+      <section className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Học tiếng Anh toàn diện
+        </h1>
+        <p className="text-muted-foreground max-w-2xl">
+          Ngữ pháp, bài học và bài tập được chấm chi tiết bởi AI — cộng thêm lối
+          tắt sang Duolingo để luyện thêm mỗi ngày.
+        </p>
+        <div className="flex flex-wrap gap-2 pt-2">
+          <Button render={<Link href="/grammar" />}>Xem ngữ pháp</Button>
+          <Button render={<Link href="/exercises" />} variant="outline">
+            Bắt đầu luyện tập
+          </Button>
+          <DuolingoLaunchButton />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-muted-foreground font-medium">
+              Chủ điểm ngữ pháp
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold">
+            {topics.length}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-muted-foreground font-medium">
+              Bài tập đã làm
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold">
+            {progress.totalAttempts} / {progress.totalExercises}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-muted-foreground font-medium">
+              Điểm trung bình
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-2xl font-semibold">
+            {progress.avgScore.toFixed(0)}/100
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="font-medium">Tiến độ tổng thể</h2>
+          <span className="text-sm text-muted-foreground">{completionPct}%</span>
         </div>
-      </main>
+        <Progress value={completionPct} />
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-medium">Chủ điểm ngữ pháp</h2>
+          <Link href="/grammar" className="text-sm text-primary hover:underline">
+            Xem tất cả
+          </Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {topics.slice(0, 6).map((topic) => (
+            <Link key={topic.id} href={`/grammar/${topic.slug}`}>
+              <Card className="h-full transition-colors hover:border-primary">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <CardTitle className="text-base">{topic.title}</CardTitle>
+                    <span className="shrink-0 rounded bg-muted px-2 py-0.5 text-xs font-medium">
+                      {topic.level}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="text-sm text-muted-foreground">
+                  {topic.summary}
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
