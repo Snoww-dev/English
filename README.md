@@ -7,7 +7,8 @@ exercises graded in detail by AI — plus a one-click shortcut into Duolingo.
 
 - **Grammar library** — 15 topics from A1 to C2 (tenses, articles, conditionals,
   passive voice, reported speech, relative clauses, inversion, and more), each with
-  a clear explanation and examples.
+  a clear explanation and examples. English words and complete example sentences
+  can be clicked to hear their pronunciation through the browser's English voice.
 - **Lessons** — a reading page tied to each grammar topic.
 - **Exercises with AI grading** — free-text answers (fill-in-the-blank, sentence
   correction, translation, free response, multiple choice) graded by OpenAI's API,

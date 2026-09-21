@@ -85,6 +85,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -127,5 +128,80 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* Dashboard-only pixel/terminal display fonts (see src/components/dashboard.tsx). */
+.font-pixel {
+  font-family: var(--font-pixel), monospace;
+}
+.font-heading {
+  font-family: var(--font-heading), sans-serif;
+}
+.font-terminal {
+  font-family: var(--font-terminal), monospace;
+}
+
+/* Weekly study board: one token set for the floppy library and timetable. */
+.study-focus-board {
+  --study-ink: oklch(0.25 0.055 297);
+  --study-ink-muted: oklch(0.42 0.045 297);
+  --study-screen: oklch(0.18 0.055 297);
+  --study-paper: oklch(0.985 0.012 91);
+  --study-paper-muted: oklch(0.955 0.018 246);
+  --study-metal: oklch(0.7 0.018 252);
+  --study-grid-line: oklch(0.86 0.025 280);
+  --study-focus: oklch(0.7 0.18 72);
+  --study-mint: oklch(0.84 0.11 172);
+  --study-mint-strong: oklch(0.75 0.11 172);
+  --study-mint-ink: oklch(0.34 0.08 172);
+  --study-pink: oklch(0.74 0.16 338);
+  --study-pink-soft: oklch(0.92 0.055 338);
+  --study-pink-ink: oklch(0.34 0.1 338);
+  --study-blue: oklch(0.72 0.14 250);
+  --study-blue-soft: oklch(0.92 0.045 250);
+  --study-blue-ink: oklch(0.33 0.09 250);
+  --study-purple: oklch(0.7 0.14 305);
+  --study-purple-soft: oklch(0.91 0.05 305);
+  --study-purple-ink: oklch(0.33 0.09 305);
+  --study-cyan: oklch(0.82 0.13 197);
+  --study-cyan-soft: oklch(0.93 0.05 197);
+  --study-cyan-ink: oklch(0.32 0.075 197);
+  --study-green: oklch(0.79 0.14 146);
+  --study-green-soft: oklch(0.93 0.055 146);
+  --study-green-ink: oklch(0.32 0.08 146);
+  --study-yellow: oklch(0.86 0.15 88);
+  --study-yellow-soft: oklch(0.96 0.055 88);
+  --study-yellow-ink: oklch(0.35 0.08 88);
+  --study-orange: oklch(0.78 0.16 55);
+  --study-orange-soft: oklch(0.94 0.055 55);
+  --study-orange-ink: oklch(0.35 0.09 55);
+  --study-planner-surface: oklch(0.93 0.055 172);
+}
+
+.study-panel-shadow {
+  box-shadow: 5px 5px 0 var(--study-ink);
+}
+
+.study-control-shadow {
+  box-shadow: 3px 3px 0 var(--study-ink);
+}
+
+/* Gentle looping left-right slide for the header mascot logo. */
+@keyframes logo-slide {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(44px);
+  }
+}
+.animate-logo-slide {
+  animation: logo-slide 4.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-logo-slide {
+    animation: none;
   }
 }

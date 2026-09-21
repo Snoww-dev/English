@@ -65,6 +65,10 @@ export async function getExercisesForTopic(topicId: number) {
     .orderBy(asc(exercises.orderIndex));
 }
 
+export async function getAllExercises() {
+  return db.select().from(exercises).orderBy(asc(exercises.orderIndex));
+}
+
 export async function getExerciseById(id: number) {
   const [exercise] = await db
     .select()
